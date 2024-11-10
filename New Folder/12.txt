@@ -1,0 +1,159 @@
+CREATE TABLE Employee (
+    emp_id NUMBER PRIMARY KEY,
+    emp_name VARCHAR2(50),
+    emp_salary NUMBER
+);
+import java.sql.*;
+import java.util.Scanner;
+
+public class OracleDBNavigation {
+
+    private static final String DB_URL = "jdbc:oracle:thin:@localhost:1521:xe"; // Modify as per your DB
+    private static final String USER = "your_username";
+    private static final String PASS = "your_password";
+
+    private Connection connection;
+    private Scanner scanner;
+
+    public OracleDBNavigation() {
+        try {
+            // Establish database connection
+            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            System.out.println("Connected to Oracle database.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        scanner = new Scanner(System.in);
+    }
+
+    // Method to add a new employee
+    public void addEmployee() {
+        try {
+            System.out.print("Enter Employee ID: ");
+            int empId = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            System.out.print("Enter Employee Name: ");
+            String empName = scanner.nextLine();
+            System.out.print("Enter Employee Salary: ");
+            double empSalary = scanner.nextDouble();
+
+            String sql = "INSERT INTO Employee (emp_id, emp_name, emp_salary) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, empId);
+            preparedStatement.setString(2, empName);
+            preparedStatement.setDouble(3, empSalary);
+
+            int rows = preparedStatement.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Employee added successfully.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to update employee details
+    public void updateEmployee() {
+        try {
+            System.out.print("Enter Employee ID to update: ");
+            int empId = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            System.out.print("Enter New Employee Name: ");
+            String empName = scanner.nextLine();
+            System.out.print("Enter New Employee Salary: ");
+            double empSalary = scanner.nextDouble();
+
+            String sql = "UPDATE Employee SET emp_name = ?, emp_salary = ? WHERE emp_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, empName);
+            preparedStatement.setDouble(2, empSalary);
+            preparedStatement.setInt(3, empId);
+
+            int rows = preparedStatement.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Employee updated successfully.");
+            } else {
+                System.out.println("Employee not found.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to delete an employee
+    public void deleteEmployee() {
+        try {
+            System.out.print("Enter Employee ID to delete: ");
+            int empId = scanner.nextInt();
+
+            String sql = "DELETE FROM Employee WHERE emp_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, empId);
+
+            int rows = preparedStatement.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Employee deleted successfully.");
+            } else {
+                System.out.println("Employee not found.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to list all employees
+    public void listEmployees() {
+        try {
+            String sql = "SELECT * FROM Employee";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            System.out.println("Employee List:");
+            while (resultSet.next()) {
+                System.out.println("ID: " + resultSet.getInt("emp_id") +
+                                   ", Name: " + resultSet.getString("emp_name") +
+                                   ", Salary: " + resultSet.getDouble("emp_salary"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Main method to run the program
+    public static void main(String[] args) {
+        OracleDBNavigation dbNav = new OracleDBNavigation();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\nChoose an operation:");
+            System.out.println("1. Add Employee");
+            System.out.println("2. Update Employee");
+            System.out.println("3. Delete Employee");
+            System.out.println("4. List Employees");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    dbNav.addEmployee();
+                    break;
+                case 2:
+                    dbNav.updateEmployee();
+                    break;
+                case 3:
+                    dbNav.deleteEmployee();
+                    break;
+                case 4:
+                    dbNav.listEmployees();
+                    break;
+                case 5:
+                    System.out.println("Exiting...");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
+    }
+}

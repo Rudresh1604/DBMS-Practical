@@ -1,0 +1,51 @@
+-- Table for employee_master
+CREATE TABLE employee_master (
+    emp_id NUMBER PRIMARY KEY,
+    first_name VARCHAR2(50),
+    middle_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    department VARCHAR2(50),
+    manager_id NUMBER,
+    branch_id NUMBER,
+    CONSTRAINT fk_branch_id FOREIGN KEY (branch_id) REFERENCES branch_master(branch_id)
+);
+
+-- Table for branch_master
+CREATE TABLE branch_master (
+    branch_id NUMBER PRIMARY KEY,
+    branch_name VARCHAR2(100)
+);
+INSERT INTO branch_master (branch_id, branch_name) VALUES (1, 'New York');
+INSERT INTO branch_master (branch_id, branch_name) VALUES (2, 'Los Angeles');
+INSERT INTO branch_master (branch_id, branch_name) VALUES (3, 'Chicago');
+INSERT INTO employee_master (emp_id, first_name, middle_name, last_name, department, manager_id, branch_id)
+VALUES (101, 'John', 'A.', 'Doe', 'Sales', NULL, 1);
+
+INSERT INTO employee_master (emp_id, first_name, middle_name, last_name, department, manager_id, branch_id)
+VALUES (102, 'Jane', 'B.', 'Smith', 'Marketing', 101, 2);
+
+INSERT INTO employee_master (emp_id, first_name, middle_name, last_name, department, manager_id, branch_id)
+VALUES (103, 'Alice', NULL, 'Brown', 'HR', NULL, 1);
+
+CREATE INDEX idx_emp_first_name ON employee_master (first_name);
+
+CREATE VIEW employee_details AS
+SELECT 
+    e.emp_id,
+    e.first_name || ' ' || NVL(e.middle_name, '') || ' ' || e.last_name AS full_name,
+    e.department,
+    e.manager_id,
+    b.branch_name
+FROM 
+    employee_master e
+JOIN 
+    branch_master b ON e.branch_id = b.branch_id;
+
+SELECT * FROM employee_details;
+
+DESCRIBE employee_details; --view--
+
+SELECT text FROM user_views WHERE view_name = 'EMPLOYEE_DETAILS'; --if you want to see the full SQL definition of the view, you can query the USER_VIEWS data dictionary:
+
+
+

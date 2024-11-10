@@ -1,0 +1,49 @@
+CREATE TABLE Dept(
+deptId INT,
+deptName VARCHAR2(20));
+
+CREATE TABLE Emp(
+empId INT,
+empName VARCHAR2(30),
+empSal INT,
+empDeptId INT
+);
+
+
+
+
+-- Inserting records into Dept table
+INSERT INTO Dept (deptId, deptName) VALUES (10, 'HR');
+INSERT INTO Dept (deptId, deptName) VALUES (20, 'Finance');
+INSERT INTO Dept (deptId, deptName) VALUES (30, 'IT');
+INSERT INTO Dept (deptId, deptName) VALUES (40, 'Marketing');
+
+
+
+-- Inserting records into Emp table
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (1, 'John', 25000, 30);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (2, 'Jane', 18000, 40);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (3, 'Alice', 22000, 10);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (4, 'Bob', 30000, 30);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (5, 'Charlie', 12000, 40);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (6, 'David', 15000, 20);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (7, 'Eva', 27000, 30);
+
+SELECT * 
+FROM Emp
+WHERE empDeptId IN (30, 40, 10);
+
+SELECT * 
+FROM Emp
+WHERE empSal BETWEEN 10000 AND 30000;
+
+SELECT COUNT(*) AS total_employees
+FROM Emp;
+
+SELECT empDeptId, AVG(empSal) AS avg_salary
+FROM Emp
+GROUP BY empDeptId;
+
+SELECT * 
+FROM Emp
+ORDER BY empSal ASC;

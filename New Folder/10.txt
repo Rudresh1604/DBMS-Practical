@@ -1,0 +1,73 @@
+-- N_RollCall Table
+CREATE TABLE N_RollCall (
+    rollno INT PRIMARY KEY,
+    name VARCHAR2(10)
+);
+
+-- O_RollCall Table
+CREATE TABLE O_RollCall (
+    rollno INT PRIMARY KEY,
+    name VARCHAR2(10)
+);
+
+-- Insert data into N_RollCall and O_RollCall
+INSERT INTO N_RollCall (rollno, name) VALUES (1, 'Alice');
+INSERT INTO N_RollCall (rollno, name) VALUES (2, 'Bob');
+INSERT INTO N_RollCall (rollno, name) VALUES (3, 'Charlie');
+
+INSERT INTO O_RollCall (rollno, name) VALUES (2, 'Bob');
+INSERT INTO O_RollCall (rollno, name) VALUES (4, 'David');
+
+select * from N_RollCall;
+
+
+-- Execute the PL/SQL block
+-- Declare the PL/SQL Block
+
+DECLARE
+    -- Define the cursor to select roll number and name from N_RollCall table
+    CURSOR cur_n_rollcall(p_rollno IN NUMBER) IS
+        SELECT rollno, name
+        FROM N_RollCall
+        WHERE rollno = p_rollno;
+
+    -- Variable to hold roll number and name from N_RollCall
+    v_rollno N_RollCall.rollno%TYPE;
+    v_name N_RollCall.name%TYPE;
+
+BEGIN
+    -- Loop through each roll number in N_RollCall
+    FOR r IN (SELECT rollno, name FROM N_RollCall) LOOP
+
+        -- Open the cursor with the current roll number
+        OPEN cur_n_rollcall(r.rollno);
+
+        -- Fetch the rollno and name from the cursor
+        FETCH cur_n_rollcall INTO v_rollno, v_name;
+
+        -- Check if the roll number already exists in O_RollCall
+        IF v_rollno IS NOT NULL THEN
+            BEGIN
+                -- Insert the data into O_RollCall if it doesn't already exist
+                INSERT INTO O_RollCall (rollno, name)
+                SELECT v_rollno, v_name FROM dual
+                WHERE NOT EXISTS (SELECT 1 FROM O_RollCall WHERE rollno = v_rollno);
+
+                COMMIT; -- Commit the transaction
+            EXCEPTION
+                WHEN OTHERS THEN
+                    -- Handle any errors
+                    ROLLBACK;
+                    DBMS_OUTPUT.PUT_LINE('Error occurred: ' || SQLERRM);
+            END;
+        END IF;
+
+        -- Close the cursor after use
+        CLOSE cur_n_rollcall;
+    END LOOP;
+
+END;
+/
+Select * from O_RollCall;
+
+

@@ -1,0 +1,45 @@
+package mongoJava;
+
+import javax.swing.text.Document;
+
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+
+
+public class javamongo {
+
+	public static void main(String[] args) {
+	
+		// Creating a Mongo client 
+				MongoClient mongoClient = new MongoClient( "localhost" , 27017 ); 
+				System.out.println("Created Mongo Connection successfully");
+				
+				MongoDatabase db = mongoClient.getDatabase("mongodbjava");
+				System.out.println("Get database is successful");
+				
+				System.out.println("Below are list of databases present in MongoDB");
+				// To get all database names        
+				 MongoCursor<String> dbsCursor = mongoClient.listDatabaseNames().iterator();
+				   while(dbsCursor.hasNext()) {
+				          System.out.println(dbsCursor.next());
+				   }
+				   
+				   //Inserting sample record by creating collection and document.
+				   MongoCollection<org.bson.Document>  collection= db.getCollection("javaprogram");
+				   org.bson.Document doc =(org.bson.Document) new org.bson.Document("name","hello world");
+				   collection.insertOne(doc);
+				   System.out.println("########### Insertion is completed  ###############");
+				   MongoCursor<String> dbsCursord = mongoClient.listDatabaseNames().iterator();
+				   while(dbsCursord.hasNext()) {
+				          System.out.println(dbsCursord.next());
+				  
+				      }
+	}
+	
+}
+
+				   
+
+

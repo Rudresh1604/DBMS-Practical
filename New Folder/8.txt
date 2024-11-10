@@ -1,0 +1,65 @@
+-- Create Stud_Marks table to store student roll number, name, and total marks
+CREATE TABLE Stud_Marks (
+    RollNo INT PRIMARY KEY,
+    name VARCHAR2(100),
+    total_marks INT
+);
+drop table Result;
+-- Create Result table to store the result for each student
+CREATE TABLE Result (
+    RollNo INT PRIMARY KEY,
+    Name VARCHAR2(100),
+    Class VARCHAR2(20),
+    CONSTRAINT fk_rollno FOREIGN KEY (RollNo) REFERENCES Stud_Marks(RollNo)
+);
+-- Insert sample student marks
+INSERT INTO Stud_Marks (RollNo, name, total_marks) VALUES (1, 'Alice', 1200);
+INSERT INTO Stud_Marks (RollNo, name, total_marks) VALUES (2, 'Bob', 950);
+INSERT INTO Stud_Marks (RollNo, name, total_marks) VALUES (3, 'Charlie', 870);
+INSERT INTO Stud_Marks (RollNo, name, total_marks) VALUES (4, 'David', 780);
+
+-- Call the stored procedure to categorize the students
+EXEC proc_Grade;
+
+-- Check the results
+SELECT * FROM Result;
+-- Create the stored procedure for grade categorization
+CREATE OR REPLACE PROCEDURE proc_Grade IS
+    -- Declare variables to hold student data
+    v_rollno Stud_Marks.RollNo%TYPE;
+    v_name Stud_Marks.name%TYPE;
+    v_marks Stud_Marks.total_marks%TYPE;
+    v_class Result.Class%TYPE;
+BEGIN
+    -- Loop through each student in Stud_Marks
+    FOR student IN (SELECT RollNo, name, total_marks FROM Stud_Marks) LOOP
+        v_rollno := student.RollNo;
+        v_name := student.name;
+        v_marks := student.total_marks;
+        
+        -- Categorize based on marks
+        IF v_marks >= 990 AND v_marks <= 1500 THEN
+            v_class := 'Distinction';
+        ELSIF v_marks >= 900 AND v_marks <= 989 THEN
+            v_class := 'First Class';
+        ELSIF v_marks >= 825 AND v_marks <= 899 THEN
+            v_class := 'Higher Second Class';
+        ELSE
+            v_class := 'Not Classified'; -- In case marks are below 825
+        END IF;
+        
+        -- Insert the result into the Result table
+        INSERT INTO Result (RollNo, Name, Class) VALUES (v_rollno, v_name, v_class);
+    END LOOP;
+
+    -- Commit the changes after processing all students
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Handle any errors
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error occurred: ' || SQLERRM);
+END proc_Grade;
+/
+

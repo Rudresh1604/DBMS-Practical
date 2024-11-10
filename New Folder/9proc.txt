@@ -1,0 +1,73 @@
+-- Create the STUD table
+CREATE TABLE stud (
+    roll_number VARCHAR2(4) PRIMARY KEY,
+    att_number NUMBER(4),
+    status VARCHAR2(1)  -- 'A' for active, 'D' for detained, etc.
+);
+drop table d_stud cascade CONSTRAINTS;
+-- Create the D_STUD table to log detained students' information
+CREATE TABLE d_stud (
+    roll_number VARCHAR2(4),
+    att_number NUMBER(4),
+    CONSTRAINT fk_roll_number FOREIGN KEY (roll_number)
+        REFERENCES stud(roll_number) ON DELETE CASCADE
+);
+-- Insert sample data into the STUD table
+INSERT INTO stud (roll_number, att_number, status) VALUES ('1001', 70, 'A');
+INSERT INTO stud (roll_number, att_number, status) VALUES ('1002', 80, 'A');
+INSERT INTO stud (roll_number, att_number, status) VALUES ('1003', 60, 'A');
+INSERT INTO stud (roll_number, att_number, status) VALUES ('1004', 85, 'A');
+INSERT INTO stud (roll_number, att_number, status) VALUES ('1005', 72, 'A');
+
+-- Commit the changes
+COMMIT;
+SELECT * FROM stud;
+SELECT * FROM d_stud;
+
+DECLARE
+    -- Define an explicit cursor to fetch students with less than 75% attendance
+    CURSOR c_students IS
+        SELECT roll_number, att_number
+        FROM stud
+        WHERE att_number < 75;
+
+    -- Variables to hold the cursor data
+    v_roll_number stud.roll_number%TYPE;
+    v_att_number stud.att_number%TYPE;
+BEGIN
+    -- Open the cursor to start fetching records
+    OPEN c_students;
+
+    -- Loop through all the records fetched by the cursor
+    LOOP
+        -- Fetch the next record into the variables
+        FETCH c_students INTO v_roll_number, v_att_number;
+
+        -- Exit the loop if no more records are found
+        EXIT WHEN c_students%NOTFOUND;
+
+        -- Update the student's status to 'D' (detained) if attendance is less than 75%
+        UPDATE stud
+        SET status = 'D'
+        WHERE roll_number = v_roll_number;
+
+        -- Insert a record into the d_stud table to log the attendance of detained students
+        INSERT INTO d_stud (roll_number, att_number)
+        VALUES (v_roll_number, v_att_number);
+
+    END LOOP;
+
+    -- Close the cursor after processing all records
+    CLOSE c_students;
+
+    -- Commit the transaction to make the changes permanent
+    COMMIT;
+
+EXCEPTION
+    -- Exception handling for any errors that might occur
+    WHEN OTHERS THEN
+        -- Rollback all changes in case of an error
+        ROLLBACK;
+        -- Output the error message to the console for debugging
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;

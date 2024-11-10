@@ -1,0 +1,88 @@
+-- Creating the Borrower table
+CREATE TABLE Borrower (
+    Roll_no INT PRIMARY KEY,
+    Name VARCHAR2(50),
+    DateofIssue DATE,
+    NameofBook VARCHAR2(50),
+    Status CHAR(1) -- 'I' for Issued, 'R' for Returned
+);
+
+-- Creating the Fine table
+CREATE TABLE Fine (
+    Roll_no INT,
+    FineDate DATE, -- Renamed from 'Date' to 'FineDate'
+    Amt NUMBER,
+    CONSTRAINT fk_borrower FOREIGN KEY (Roll_no) REFERENCES Borrower(Roll_no)
+);
+
+-- Insert sample records into Borrower table
+INSERT INTO Borrower (Roll_no, Name, DateofIssue, NameofBook, Status) VALUES (1, 'Alice', SYSDATE - 20, 'Oracle SQL', 'I');
+INSERT INTO Borrower (Roll_no, Name, DateofIssue, NameofBook, Status) VALUES (2, 'Bob', SYSDATE - 35, 'Database Concepts', 'I');
+INSERT INTO Borrower (Roll_no, Name, DateofIssue, NameofBook, Status) VALUES (3, 'Charlie', SYSDATE - 10, 'PL/SQL Programming', 'I');
+
+COMMIT;
+drop table borrower cascade constraint;
+-- Creating the stored procedure to calculate fine with additional conditions
+CREATE OR REPLACE PROCEDURE calculate_fine (
+    p_roll_no IN Borrower.Roll_no%TYPE,
+    p_nameofbook IN Borrower.NameofBook%TYPE
+)
+IS
+    v_days_due NUMBER;
+    v_fine_amt NUMBER := 0;
+    overdue_exception EXCEPTION;
+
+BEGIN
+    -- Find the number of days since the book was issued
+    SELECT TRUNC(SYSDATE - DateofIssue)
+    INTO v_days_due
+    FROM Borrower
+    WHERE Roll_no = p_roll_no AND NameofBook = p_nameofbook;
+
+    -- Calculate fine based on days overdue
+    IF v_days_due > 15 AND v_days_due <= 30 THEN
+        v_fine_amt := (v_days_due - 15) * 5;
+    ELSIF v_days_due > 30 THEN
+        v_fine_amt := (30 - 15) * 5 + (v_days_due - 30) * 50;
+    END IF;
+
+    -- Update the book status to 'R' for returned
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Roll_no = p_roll_no AND NameofBook = p_nameofbook;
+
+    -- Insert fine details into Fine table if a fine exists
+    IF v_fine_amt > 0 THEN
+        INSERT INTO Fine (Roll_no, FineDate, Amt)
+        VALUES (p_roll_no, SYSDATE, v_fine_amt);
+    END IF;
+
+    -- Display the result
+    DBMS_OUTPUT.PUT_LINE('Fine calculated for Roll No: ' || p_roll_no || ' is Rs. ' || v_fine_amt);
+
+EXCEPTION
+    -- Named exception handling for no data found
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No record found for Roll No: ' || p_roll_no || ' and Book: ' || p_nameofbook);
+
+    -- Named exception for overdue fine calculation errors (optional, can be raised manually if needed)
+    WHEN overdue_exception THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred while calculating the fine for Roll No: ' || p_roll_no);
+
+    -- General exception handler for any other errors
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An unexpected error occurred. Error code: ' || SQLCODE || ' Error message: ' || SQLERRM);
+
+END calculate_fine;
+/
+
+-- Enable DBMS_OUTPUT to see messages
+SET SERVEROUTPUT ON;
+
+-- Test the procedure with user input
+BEGIN
+    -- Accept user input for Roll_no and NameofBook
+    calculate_fine(&Roll_no, '&NameofBook');
+END;
+/
+select * from fine;

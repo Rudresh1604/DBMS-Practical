@@ -1,0 +1,103 @@
+-- Creating employee table
+CREATE TABLE employee (
+    employee_name VARCHAR2(50),
+    street VARCHAR2(100),
+    city VARCHAR2(50),
+    PRIMARY KEY (employee_name)
+);
+
+-- Creating works table
+CREATE TABLE works (
+    employee_name VARCHAR2(50),
+    company_name VARCHAR2(50),
+    salary INT,
+    PRIMARY KEY (employee_name, company_name),
+    FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    FOREIGN KEY (company_name) REFERENCES company(company_name)
+);
+
+-- Creating company table
+CREATE TABLE company (
+    company_name VARCHAR2(50),
+    city VARCHAR2(50),
+    PRIMARY KEY (company_name)
+);
+
+-- Creating manages table
+CREATE TABLE manages (
+    employee_name VARCHAR2(50),
+    manager_name VARCHAR2(50),
+    PRIMARY KEY (employee_name),
+    FOREIGN KEY (employee_name) REFERENCES employee(employee_name),
+    FOREIGN KEY (manager_name) REFERENCES employee(employee_name)
+);
+
+-- Inserting data into employee table
+INSERT INTO employee (employee_name, street, city)
+VALUES ('John Doe', '123 Elm St', 'New York');
+INSERT INTO employee (employee_name, street, city)
+VALUES ('Jane Smith', '456 Oak St', 'San Francisco');
+INSERT INTO employee (employee_name, street, city)
+VALUES ('Alice Johnson', '789 Pine St', 'Chicago');
+INSERT INTO employee (employee_name, street, city)
+VALUES ('Bob Brown', '101 Maple St', 'Los Angeles');
+INSERT INTO employee (employee_name, street, city)
+VALUES ('Charlie White', '202 Birch St', 'San Francisco');
+
+-- Inserting data into company table
+INSERT INTO company (company_name, city)
+VALUES ('First Bank Corporation', 'New York');
+INSERT INTO company (company_name, city)
+VALUES ('Tech Solutions', 'San Francisco');
+INSERT INTO company (company_name, city)
+VALUES ('Global Enterprises', 'Chicago');
+INSERT INTO company (company_name, city)
+VALUES ('Finance Group', 'Los Angeles');
+INSERT INTO company (company_name, city)
+VALUES ('Retail World', 'San Francisco');
+
+-- Inserting data into works table
+INSERT INTO works (employee_name, company_name, salary)
+VALUES ('John Doe', 'First Bank Corporation', 12000);
+INSERT INTO works (employee_name, company_name, salary)
+VALUES ('Jane Smith', 'Tech Solutions', 9000);
+INSERT INTO works (employee_name, company_name, salary)
+VALUES ('Alice Johnson', 'Global Enterprises', 15000);
+INSERT INTO works (employee_name, company_name, salary)
+VALUES ('Bob Brown', 'First Bank Corporation', 18000);
+INSERT INTO works (employee_name, company_name, salary)
+VALUES ('Charlie White', 'Retail World', 20000);
+
+-- Inserting data into manages table
+INSERT INTO manages (employee_name, manager_name)
+VALUES ('John Doe', 'Alice Johnson');
+INSERT INTO manages (employee_name, manager_name)
+VALUES ('Jane Smith', 'Bob Brown');
+INSERT INTO manages (employee_name, manager_name)
+VALUES ('Alice Johnson', 'Charlie White');
+INSERT INTO manages (employee_name, manager_name)
+VALUES ('Bob Brown', 'John Doe');
+INSERT INTO manages (employee_name, manager_name)
+VALUES ('Charlie White', 'Jane Smith');
+
+SELECT e.employee_name, e.street, e.city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+WHERE w.company_name = 'First Bank Corporation'
+AND w.salary > 10000;
+
+SELECT e.employee_name
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+JOIN company c ON w.company_name = c.company_name
+WHERE e.city = c.city;
+
+SELECT AVG(w.salary) AS avg_salary
+FROM works w
+WHERE w.company_name = 'First Bank Corporation';
+
+
+UPDATE works
+SET salary = salary * 1.15
+WHERE company_name = 'First Bank Corporation'
+AND salary < 20000;

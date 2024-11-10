@@ -1,0 +1,38 @@
+-- Creating the Dept table
+CREATE TABLE Dept (
+    deptId INT PRIMARY KEY,   -- Setting deptId as Primary Key
+    deptName VARCHAR2(10)     -- Department Name
+);
+
+-- Creating the Emp table
+CREATE TABLE Emp (
+    empId INT PRIMARY KEY,     -- Setting empId as Primary Key
+    empName VARCHAR2(10) NOT NULL,   -- empName with NOT NULL constraint
+    empSal INT,                -- Employee Salary
+    empDeptId INT,             -- Foreign key linking to Dept
+    CONSTRAINT fk_dept FOREIGN KEY (empDeptId) REFERENCES Dept(deptId)  -- Foreign Key constraint
+);
+
+-- Inserting records into Dept table
+INSERT INTO Dept (deptId, deptName) VALUES (1, 'HR');
+INSERT INTO Dept (deptId, deptName) VALUES (2, 'IT');
+INSERT INTO Dept (deptId, deptName) VALUES (3, 'Finance');
+
+-- Inserting records into Emp table
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (101, 'John', 5000, 1);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (102, 'Jane', 7000, 2);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (103, 'Alice', 6000, 3);
+INSERT INTO Emp (empId, empName, empSal, empDeptId) VALUES (104, 'Bob', 8000, 2);
+
+-- Add the column deptLoc to Dept table and set it as UNIQUE
+ALTER TABLE Dept 
+ADD (deptLoc VARCHAR2(10));
+
+-- Add UNIQUE constraint on deptLoc
+ALTER TABLE Dept 
+ADD CONSTRAINT unique_deptLoc UNIQUE (deptLoc);
+
+SELECT * FROM Dept;
+
+SELECT * FROM  Emp;
+

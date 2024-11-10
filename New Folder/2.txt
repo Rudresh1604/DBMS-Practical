@@ -1,0 +1,59 @@
+-- Creating the Student table
+CREATE TABLE Student (
+    stud_id INT PRIMARY KEY,
+    deptnm VARCHAR2(50),
+    sem INT,
+    name VARCHAR2(100),
+    yr INT,
+    credits INT
+);
+SELECT * FROM STUDENT;
+-- Creating the Teaches table
+CREATE TABLE Teaches (
+    teacher_id INT PRIMARY KEY,
+    teacher_name VARCHAR2(100),
+    salary INT,
+    deptnm VARCHAR2(50)
+);
+
+-- Inserting records into the Student table
+INSERT INTO Student (stud_id, deptnm, sem, name, yr, credits) VALUES (1, 'COMP', 1, 'Alice', 2024, 15);
+INSERT INTO Student (stud_id, deptnm, sem, name, yr, credits) VALUES (2, 'MATH', 2, 'Bob', 2024, 18);
+INSERT INTO Student (stud_id, deptnm, sem, name, yr, credits) VALUES (3, 'IT', 1, 'Charlie', 2024, 12);
+INSERT INTO Student (stud_id, deptnm, sem, name, yr, credits) VALUES (4, 'COMP', 3, 'David', 2024, 20);
+INSERT INTO Student (stud_id, deptnm, sem, name, yr, credits) VALUES (5, 'IT', 4, 'Eva', 2024, 17);
+
+
+-- Inserting records into the Teaches table
+INSERT INTO Teaches (teacher_id, teacher_name, salary, deptnm) VALUES (101, 'Dr. Smith', 2500, 'COMP');
+INSERT INTO Teaches (teacher_id, teacher_name, salary, deptnm) VALUES (102, 'Dr. Jones', 1800, 'MATH');
+INSERT INTO Teaches (teacher_id, teacher_name, salary, deptnm) VALUES (103, 'Dr. Lee', 3200, 'IT');
+INSERT INTO Teaches (teacher_id, teacher_name, salary, deptnm) VALUES (104, 'Dr. Brown', 2200, 'COMP');
+INSERT INTO Teaches (teacher_id, teacher_name, salary, deptnm) VALUES (105, 'Dr. Green', 1800, 'MATH');
+
+
+-- Update department from 'COMP' to 'IT' in the Student table
+UPDATE Student
+SET deptnm = 'IT'
+WHERE deptnm = 'COMP';
+
+-- Find the department with the highest salary in Teaches
+SELECT deptnm, MAX(salary) AS max_salary
+FROM Teaches
+GROUP BY deptnm
+ORDER BY max_salary DESC
+FETCH FIRST 1 ROWS ONLY;
+
+-- Find the department with the average salary in Teaches
+SELECT deptnm, AVG(salary) AS avg_salary
+FROM Teaches
+GROUP BY deptnm;
+
+-- Delete records from Teaches for teachers with salary below 2000
+DELETE FROM Teaches
+WHERE salary < 2000;
+
+-- Find the sum of salary for each department
+SELECT deptnm, SUM(salary) AS total_salary
+FROM Teaches
+GROUP BY deptnm;
