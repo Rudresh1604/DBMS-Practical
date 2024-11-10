@@ -1,0 +1,167 @@
+Required JDk, eclipse, MongoDB installed and .jar file
+Step 1:
+● Open Eclipse
+● Create Java Project (File-&gt;New-&gt;Other-&gt;Java Proj-&gt;Next-&gt;provide Name of Proj-&gt;next-
+&gt;Finish)
+● Create new class (src-&gt;right click-&gt;class-&gt;name-&gt;main method-&gt;default package)
+Step 2
+● For adding .jar file mongo-java-driver-2.12.2.jar
+● right click on project-&gt;build path-&gt;configure build path-&gt;java build path-&gt;library-
+&gt;classpath-&gt;add external jars—-----for adding, path….mongodb folder .jar……apply and
+close.
+B4.java (Execute this B4.java and validate in MongoDB)
+import com.mongodb.*;
+public class B4
+{
+public static void main( String args[] )
+{
+try
+{
+MongoClient mongoClient = new MongoClient( &quot;localhost&quot; , 27017 );
+DB db = mongoClient.getDB( &quot;ajk&quot; );
+System.out.println(&quot;Connect to database successfully&quot;);
+DBCollection col1=db.createCollection(&quot;st2&quot;,new BasicDBObject());
+System.out.println(&quot;collection created&quot;);
+DBCollection col2=db.createCollection(&quot;fa2&quot;,new BasicDBObject());
+System.out.println(&quot;collection created&quot;);
+BasicDBObject doc1 = new BasicDBObject();
+doc1.put(&quot;Rno&quot;, &quot;1&quot;);
+doc1.put(&quot;Name&quot;, &quot;AJK&quot;);
+doc1.put(&quot;Marks&quot;, &quot;75&quot;);
+BasicDBObject doc2 = new BasicDBObject();
+doc2.put(&quot;Rno&quot;, &quot;2&quot;);
+doc2.put(&quot;Name&quot;, &quot;QWE&quot;);
+
+doc2.put(&quot;Marks&quot;, &quot;80&quot;);
+col1.insert(new BasicDBObject[] {doc1,doc2});
+}
+catch(Exception e)
+{
+System.err.println( e.getClass().getName() + &quot;: &quot; + e.getMessage() );
+}
+}
+}
+Output:
+(base) dypiemr@dypiemr-OptiPlex-3020:~$ mongo
+&gt; show databases
+admin 0.000GB
+aj 0.000GB
+ajk 0.000GB
+config 0.000GB
+local 0.000GB
+myDb 0.000GB
+test 0.000GB
+&gt; use ajk
+switched to db ajk
+&gt; show collections
+fa1
+fa2
+st1
+st2
+&gt; db.st2.find().pretty();
+{
+&quot;_id&quot; : ObjectId(&quot;66ff8855848e88f93789438f&quot;),
+&quot;Rno&quot; : &quot;1&quot;,
+&quot;Name&quot; : &quot;AJK&quot;,
+&quot;Marks&quot; : &quot;75&quot;
+}
+{
+&quot;_id&quot; : ObjectId(&quot;66ff8855848e88f937894390&quot;),
+
+&quot;Rno&quot; : &quot;2&quot;,
+&quot;Name&quot; : &quot;QWE&quot;,
+&quot;Marks&quot; : &quot;80&quot;
+}
+&gt;
+Menu Driven Program:
+import java.net.UnknownHostException;
+import java.util.Scanner;
+import com.mongodb.*;
+public class MDB
+{
+private static void choice_input()
+{
+System.out.println(&quot;\n1.insert \n2.update \n3.delete \n4.show \n5.Exit&quot;);
+}
+public static void main(String[] args)
+{
+String key, value;
+Scanner scanner = new Scanner(System.in);
+int choice;
+try
+{
+Mongo mongo = new Mongo(&quot;localhost&quot;, 27017);
+DB db = mongo.getDB(&quot;AJK_MDB&quot;);
+DBCollection collection = db.getCollection(&quot;Student_mdb&quot;);
+do
+{
+choice_input();
+System.out.println(&quot;Enter your choice: &quot;);
+choice = scanner.nextInt();
+switch (choice)
+{
+case 1:
+BasicDBObject document = new BasicDBObject();
+String ch;
+do
+{
+System.out.println(&quot;Enter key: &quot;);
+key = scanner.next();
+
+System.out.println(&quot;Enter value: &quot;);
+value = scanner.next();document.put(key, value);
+System.out.println(&quot;Do you want to enter
+
+more(y/n)? &quot;);
+
+ch = scanner.next();
+}
+while (!ch.equals(&quot;n&quot;));
+collection.insert(document);
+break;
+case 2:
+BasicDBObject searchObj = new BasicDBObject();
+System.out.println(&quot;Enter searched key: &quot;);
+key = scanner.next();
+System.out.println(&quot;Enter searched value: &quot;);
+value = scanner.next();
+searchObj.put(key, value);
+BasicDBObject newObj = new BasicDBObject();
+System.out.println(&quot;Enter new key: &quot;);
+key = scanner.next();
+System.out.println(&quot;Enter new value: &quot;);
+value = scanner.next();
+newObj.put(key, value);
+collection.update(searchObj, newObj);
+break;
+case 3:
+System.out.println(&quot;Enter removable key: &quot;);
+key = scanner.next();
+System.out.println(&quot;Enter removable value: &quot;);
+value = scanner.next();
+BasicDBObject removableObj = new BasicDBObject();
+removableObj.put(key, value);
+collection.remove(removableObj);
+break;
+case 4:
+DBCursor cursorDoc = collection.find();
+while (cursorDoc.hasNext())
+{
+System.out.println(cursorDoc.next());
+}
+break;
+
+case 5:
+System.exit(0);
+break;
+
+}
+}
+while(choice != 6);
+}
+catch (UnknownHostException | MongoException e)
+{
+e.printStackTrace();
+}
+}
+}

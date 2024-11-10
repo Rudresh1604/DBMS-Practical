@@ -1,0 +1,18 @@
+Declare
+    Cursor crsr_att is select roll, att,status from stud21 where att<75;
+    mroll stud21.roll%type;
+    matt stud21.att%type;
+    mstatus stud21.status%type;
+Begin
+    open crsr_att;
+    if crsr_att%isopen then
+        loop
+            fetch crsr_att into mroll,matt,mstatus;
+            exit when crsr_att%notfound;
+            if crsr_att%found then
+                update stud21 set status='D' where roll=mroll;
+                insert into d_stud values(mroll,matt);
+            end if;
+        end loop;
+    end if;
+end;

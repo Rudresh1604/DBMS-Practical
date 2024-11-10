@@ -1,0 +1,38 @@
+
+create or replace procedure proc_grade
+(temp in number,
+p_roll_no out stud_marks.roll_no%type,
+p_name out stud_marks.name%type,
+p_total out stud_marks.total_marks%type)
+as
+begin
+select name,total_marks,roll_no into p_name,p_total,p_roll_no from stud_marks where roll_no=temp;
+if p_total <=1500 and p_total >= 990 then
+insert into result values(p_roll_no,p_name,'distinction');
+else if p_total <=989 and p_total >= 900 then
+insert into result values(p_roll_no,p_name,'first class');
+else if p_total <=899 and p_total >= 825 then
+insert into result values(p_roll_no,p_name,'HSC');
+else
+insert into result values(p_roll_no,p_name,'fail');
+end if;
+end if;
+end if;
+exception
+when no_data_found then
+dbms_output.put_line('Roll no ' || temp ||' not found');
+end;
+/
+
+
+
+Declare
+temp number(20);
+p_roll_no stud_marks.roll_no%type;
+p_name stud_marks.name%type;
+p_total stud_marks.total_marks%type;
+Begin
+temp:=&temp;
+Proc_grade(temp,p_roll_no,p_name,p_total);
+End;
+/

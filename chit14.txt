@@ -1,0 +1,27 @@
+db.createCollection('Employee');
+db.Employee.insertMany([
+  { 'Name': 'Piyush', 'Dept': 'Accounts', 'sal': 50000 },
+  { 'Name': 'Pradeep', 'Dept': 'Finance', 'sal': 45000 },
+  { 'Name': 'Abhi', 'Dept': 'HR', 'sal': 80000 },
+  { 'Name': 'Ashley', 'Dept': 'HR', 'sal': 85000 },
+  { 'Name': 'Vipul', 'Dept': 'Finance', 'sal': 25000 },
+  { 'Name': 'Pooja', 'Dept': 'Finance', 'sal': 95000 },
+  { 'Name': 'Pawan', 'Dept': 'HR', 'sal': 65000 },
+  { 'Name': 'Jitu', 'Dept': 'HR', 'sal': 70000 }
+]);
+
+db.Employee.find({ "sal": { $gt: 50000 } }).pretty();
+db.Employee.find({ "sal": { $gt: 50000, $lt: 80000 } }).pretty();
+db.Employee.find({ $and: [{ "sal": { $gt: 60000 } }, { "Dept": "HR" }] }).pretty();
+// db.Employee.updateMany({'Dept':'HR'},{$set: {'sal':'50000',"increment":'10%' }});
+
+db.Employee.find({'Dept': 'HR'}).forEach(function(employee) {
+    employee.sal = '50000';
+    employee.increment = '10%';
+    db.Employee.save(employee);
+});
+
+db.Employee.find().pretty();
+
+// Delete one employee document with 'sal' less than 10000 in 'Finance' department
+db.Employee.deleteOne({ $and: [{ "sal": { $lt: 10000 } }, { "Dept": "Finance" }] });

@@ -1,0 +1,22 @@
+Declare
+cursor crsr_class is select * from O_RollCall;
+cursor crsr_chk(str_name varchar) is select roll from N_RollCall where name = 
+str_name; 
+str_roll N_RollCall.roll%type;
+str_name N_RollCall.name%type;
+v varchar(10);
+Begin
+Open crsr_class;
+Loop
+fetch crsr_class into str_roll,str_name;
+Exit When crsr_class%NOTFOUND;
+Open crsr_chk(str_name);
+Fetch crsr_chk into v;
+if crsr_chk%FOUND Then
+dbms_output.put_line('brach'|| str_name || 'exist');
+Else
+dbms_output.put_line('brach'|| str_name || ' not exist. Inserting in 
+N_RollCall table'); 
+insert into N_RollCall values(str_roll,str_name); End if;
+Close crsr_chk;
+End loop;

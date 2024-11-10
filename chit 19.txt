@@ -1,0 +1,58 @@
+CREATE TABLE customer (
+    customer_id INT PRIMARY KEY,
+    first_name VARCHAR(50)
+);
+
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    amount DECIMAL(10, 2),
+    customer_id INT,
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
+);
+
+INSERT INTO customer (customer_id, first_name) VALUES
+(1, 'John'),
+(2, 'Jane'),
+(3, 'Alice'),
+(4, 'Bob'),
+(5, 'Eve'); 
+
+INSERT INTO orders (order_id, amount, customer_id) VALUES
+(101, 150.75, 1),
+(102, 200.50, 2),
+(103, 99.99, 3),
+(104, 300.00, 1),
+(105, 120.00, 4),
+
+SELECT customer.customer_id, customer.first_name, orders.order_id, orders.amount
+FROM customer
+INNER JOIN orders ON customer.customer_id = orders.customer_id;
+
+
+
+
+SELECT customer.customer_id, customer.first_name, orders.order_id, orders.amount
+FROM customer
+LEFT JOIN orders ON customer.customer_id = orders.customer_id;
+
+
+
+
+SELECT customer.customer_id, customer.first_name, orders.order_id, orders.amount
+FROM customer
+RIGHT JOIN orders ON customer.customer_id = orders.customer_id;
+
+
+
+
+
+SELECT customer.customer_id, customer.first_name, orders.order_id, orders.amount
+FROM customer
+LEFT JOIN orders ON customer.customer_id = orders.customer_id
+UNION
+SELECT customer.customer_id, customer.first_name, orders.order_id, orders.amount
+FROM customer
+RIGHT JOIN orders ON customer.customer_id = orders.customer_id;
+
+
