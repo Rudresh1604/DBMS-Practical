@@ -1,0 +1,4 @@
+mongo terminal command to set up
+mongo --quiet
+show dbs;
+Use database_name;
